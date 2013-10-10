@@ -1,29 +1,33 @@
 # encoding: utf-8
 
-class MemoryStorage
+module Mlk
 
-  def initialize(namespace)
-    @namespace = namespace
-  end
+  class MemoryStorage
 
-  def all
-    storage
-  end
+    def initialize(namespace)
+      @namespace = namespace
+    end
 
-  def save(name, model_data)
-    storage[name] = model_data unless storage.has_key?(name)
+    def all
+      storage
+    end
 
-    true
-  end
+    def save(name, model_data)
+      storage[name] = model_data unless storage.has_key?(name)
 
-  private
+      true
+    end
 
-  def self.storage
-    @data ||= { }
-  end
+    private
 
-  def storage
-    self.class.storage[@namespace] ||= { }
+    def self.storage
+      @data ||= { }
+    end
+
+    def storage
+      self.class.storage[@namespace] ||= { }
+    end
+
   end
 
 end

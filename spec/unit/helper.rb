@@ -17,9 +17,7 @@ rescue LoadError
   # Continue, but without colors
 end
 
-puts 'fuuuu'
-
-Model.storage_engine = MemoryStorage
+Mlk::Model.storage_engine = Mlk::MemoryStorage
 
 def generate_document(header, content = '')
 <<-EOF

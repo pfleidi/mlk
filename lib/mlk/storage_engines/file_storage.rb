@@ -1,36 +1,42 @@
 # encoding: utf-8
 
-class FileStorage
 
-  class << self
-    attr_accessor :base_path
-  end
+module Mlk
 
-  def initialize(namespace)
-    @namespace = namespace
-  end
+  class FileStorage
 
-  def all
-    all_files = scan_files
-
-    all_files.each_with_object({ }) do |path, hsh|
-      hsh[path] = File.read(path)
+    class << self
+      attr_accessor :base_path
     end
-  end
 
-  def save(model)
-    # currently a no-op
-  end
+    def initialize(namespace)
+      @namespace = namespace
+    end
 
-  private
+    def all
+      all_files = scan_files
 
-  def path
-    "#{ self.class.base_path }/#{ @namespace }"
-  end
+      all_files.each_with_object({ }) do |path, hsh|
+        hsh[path] = File.read(path)
+      end
+    end
 
-  def scan_files
-    files = "#{ path }/**/*.{markdown,md}"
-    Dir[files]
+    def save(model)
+      # currently a no-op
+    end
+
+    private
+
+    def path
+      "#{ self.class.base_path }/#{ @namespace }"
+    end
+
+    def scan_files
+      files = "#{ path }/**/*.{markdown,md}"
+      Dir[files]
+    end
+
   end
 
 end
+
