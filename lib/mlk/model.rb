@@ -8,7 +8,7 @@ module Mlk
     include Scrivener::Validations
     extend SingleForwardable
 
-    def_delegators :all, :first, :find, :find_match
+    def_delegators :all, :[], :first, :find, :find_match
 
     class << self
       attr_accessor :storage_engine
@@ -22,19 +22,6 @@ module Mlk
       defined_models << subclass
     end
 
-    def self.storage
-      ref = Utils.pluralize(to_reference)
-      Model.storage_engine.new(ref)
-    end
-
-    def self.default_sort_by
-      :name
-    end
-
-    def self.[](name)
-      all.first(:name => name)
-    end
-
     def self.all
       results = storage.all.map do |path, raw_document|
         document = Document.new(raw_document)
@@ -42,6 +29,12 @@ module Mlk
       end
 
       ResultSet.new(results)
+    end
+
+    def self.add_attribute(attr)
+      @attrs ||= [ ]
+
+      @attrs << attr
     end
 
     # Manage relations between models
@@ -52,12 +45,6 @@ module Mlk
       end
 
       add_attribute(name)
-    end
-
-    def self.add_attribute(attr)
-      @attrs ||= [ ]
-
-      @attrs << attr
     end
 
     def self.attributes
@@ -87,19 +74,21 @@ module Mlk
       end
     end
 
-    def self.to_reference
-      self.name.downcase
-    end
-
-    attr_reader :document, :content, :data
+    attr_reader :document
 
     attribute :name
 
     def initialize(document, options = { })
       @path = options[:path]
       @document = document
-      @content = @document.content
-      @data = @document.data
+    end
+
+    def content
+      document.content
+    end
+
+    def data
+      document.data
     end
 
     def attributes
@@ -110,24 +99,21 @@ module Mlk
       assert_present(:name)
     end
 
-    def template
-      if @data["template"]
-        @data["template"].to_sym
-      else
-        default_template
-      end
-    end
-
-    def default_template
-      self.class.name.downcase.to_sym
-    end
-
     def ==(other_model)
       self.document == other_model.document
     end
 
     def save
       self.class.storage.save(self.name, @document.serialize)
+    end
+
+    def self.storage
+      ref = Utils.pluralize(to_reference)
+      Model.storage_engine.new(ref)
+    end
+
+    def self.to_reference
+      self.name.downcase
     end
 
   end

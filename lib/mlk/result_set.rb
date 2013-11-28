@@ -40,6 +40,10 @@ module Mlk
 
     alias_method :length, :size
 
+    def [](name)
+      first(:name => name)
+    end
+
     def first(filters = {})
       find(filters).results.first
     end
