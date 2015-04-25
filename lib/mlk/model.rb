@@ -41,7 +41,7 @@ module Mlk
 
     def self.attribute(name)
       define_method(name) do
-        @data[name.to_s]
+        data[name.to_s]
       end
 
       add_attribute(name)
