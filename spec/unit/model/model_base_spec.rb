@@ -4,15 +4,16 @@ require_relative '../helper'
 
 module Mlk
 
-  class TestModel < Model
-    attribute :test
-  end
-
-  class OtherModel < TestModel
-    attribute :asdf
-  end
-
   describe Model do
+    class TestModel < Model
+      attribute :test
+    end
+
+    class OtherModel < TestModel
+      attribute :asdf
+      attribute :other, -> { 'fallback' }
+    end
+
     let(:data) { { 'name' => 'foobert', 'foo' => 'bar' } }
     let(:document) { stub(:content => 'content', :data => data) }
 
@@ -21,9 +22,8 @@ module Mlk
     describe '.attribute' do
       let(:data) { { 'name' => 'a', 'test' => 'b' } }
 
-      let(:model_instance) do
-        TestModel.new(document)
-      end
+      let(:model_instance) { TestModel.new(document) }
+      let(:model2_instance) { OtherModel.new(document) }
 
       it 'should have valid getter methods' do
         model_instance.must_respond_to(:name)
@@ -34,6 +34,10 @@ module Mlk
         model_instance.name.must_equal('a')
         model_instance.test.must_equal('b')
       end
+
+      it 'returns default values' do
+        model2_instance.other.must_equal('fallback')
+      end
     end
 
     describe '.attributes' do
@@ -42,7 +46,7 @@ module Mlk
       end
 
       it 'should return the correct inherited attributes' do
-        OtherModel.attributes.must_equal([ :name, :test, :asdf ])
+        OtherModel.attributes.must_equal([ :name, :test, :asdf, :other ])
       end
     end
 

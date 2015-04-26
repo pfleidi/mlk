@@ -39,9 +39,9 @@ module Mlk
 
     # Manage relations between models
 
-    def self.attribute(name)
+    def self.attribute(name, block = -> {})
       define_method(name) do
-        data[name.to_s]
+        data.fetch(name.to_s) { block.call }
       end
 
       add_attribute(name)
