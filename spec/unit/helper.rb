@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-if ENV["CI"]
+if ENV['CI']
   require 'coveralls'
   Coveralls.wear!
 else
@@ -11,10 +11,8 @@ end
 require 'minitest/autorun'
 require 'mocha/setup'
 
-require 'ostruct'
-
 require 'pry'
-require 'pry-debugger'
+require 'pry-byebug'
 
 require 'mlk'
 require 'mlk/storage_engines/memory_storage'

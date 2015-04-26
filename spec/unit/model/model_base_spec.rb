@@ -13,27 +13,30 @@ module Mlk
   end
 
   describe Model do
+    let(:data) { { 'name' => 'foobert', 'foo' => 'bar' } }
+    let(:document) { stub(:content => 'content', :data => data) }
 
-    describe 'attribute' do
+    subject { Model.new(document) }
 
-      let(:test_model) do
-        TestModel.new(mock_with_attributes(
-          content: 'foo',
-          data: { 'name' => 'a', 'test' => 'b' }
-        ))
+    describe '.attribute' do
+      let(:data) { { 'name' => 'a', 'test' => 'b' } }
+
+      let(:model_instance) do
+        TestModel.new(document)
       end
 
       it 'should have valid getter methods' do
-        test_model.must_respond_to(:name)
-        test_model.must_respond_to(:test)
-        test_model.name.must_equal('a')
-        test_model.test.must_equal('b')
+        model_instance.must_respond_to(:name)
+        model_instance.must_respond_to(:test)
       end
 
+      it 'returns the valid values' do
+        model_instance.name.must_equal('a')
+        model_instance.test.must_equal('b')
+      end
     end
 
-    describe 'attributes' do
-
+    describe '.attributes' do
       it 'should return the correct attributes' do
         TestModel.attributes.must_equal([ :name, :test ])
       end
@@ -41,42 +44,33 @@ module Mlk
       it 'should return the correct inherited attributes' do
         OtherModel.attributes.must_equal([ :name, :test, :asdf ])
       end
-
     end
 
-    describe 'has_attribute?' do
+    describe '.has_attribute?' do
       # TODO write tests and implement
     end
 
-    describe '#initialize' do
-
-      it 'should call the right document methods' do
-        data = { 'foo' => 'bar' }
-        document = mock_with_attributes(content: 'content', data: data)
-        model = Model.new(document)
-        model.content.must_equal('content')
-        model.data.must_equal(data)
+    describe '#content' do
+      it 'returns the correct content' do
+        subject.content.must_equal('content')
       end
-
     end
 
-    describe '#content' do
-
-      it 'can set the content' do
-        document = mock_with_attributes(
-          content: 'Some content',
-          data: { 'name' => 'epi' }
-        )
-        episode = Model.new(document)
-        episode.content.must_equal('Some content')
+    describe '#data' do
+      it 'returns the correct data' do
+        subject.data.must_equal(data)
       end
+    end
 
+    describe '#name' do
+      it 'returns the correct name' do
+        subject.name.must_equal('foobert')
+      end
     end
 
     describe '#valid?' do
-
-      it 'should be invalid without a name' do
-        document = stub(content: 'CONTENT', data: { 'noname' => 'a' })
+      it 'is invalid without a name' do
+        document.stubs(:data).returns({ 'name' => nil })
         Model.new(document).valid?.must_equal(false)
       end
 
@@ -84,9 +78,7 @@ module Mlk
         document = stub(content: 'CONTENT', data: { 'name' => 'Peter' })
         Model.new(document).valid?.must_equal(true)
       end
-
     end
-
   end
 
 end
