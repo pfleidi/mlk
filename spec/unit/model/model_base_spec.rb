@@ -12,6 +12,7 @@ module Mlk
     class OtherModel < TestModel
       attribute :asdf
       attribute :other, -> { 'fallback' }
+      attribute :asdf2, ->(i) { i.asdf }
     end
 
     let(:data) { { 'name' => 'foobert', 'foo' => 'bar' } }
@@ -20,7 +21,7 @@ module Mlk
     subject { Model.new(document) }
 
     describe '.attribute' do
-      let(:data) { { 'name' => 'a', 'test' => 'b' } }
+      let(:data) { { 'asdf' => 'woohoo', 'name' => 'a', 'test' => 'b' } }
 
       let(:model_instance) { TestModel.new(document) }
       let(:model2_instance) { OtherModel.new(document) }
@@ -38,6 +39,10 @@ module Mlk
       it 'returns default values' do
         model2_instance.other.must_equal('fallback')
       end
+
+      it 'returns default values that use a method' do
+        model2_instance.asdf2.must_equal('woohoo')
+      end
     end
 
     describe '.attributes' do
@@ -46,7 +51,7 @@ module Mlk
       end
 
       it 'should return the correct inherited attributes' do
-        OtherModel.attributes.must_equal([ :name, :test, :asdf, :other ])
+        OtherModel.attributes.must_equal([ :name, :test, :asdf, :other, :asdf2])
       end
     end
 

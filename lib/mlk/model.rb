@@ -41,7 +41,9 @@ module Mlk
 
     def self.attribute(name, block = -> {})
       define_method(name) do
-        data.fetch(name.to_s) { block.call }
+        data.fetch(name.to_s) do
+          block.arity == 1 ? block.call(self) : block.call
+        end
       end
 
       add_attribute(name)
