@@ -1,10 +1,15 @@
 # encoding: utf-8
 
+require 'forwardable'
+
 module Mlk
 
   class ResultSet
+    extend Forwardable
 
     attr_reader :results
+
+    def_delegators :@results, :each, :include?, :empty?, :size, :length
 
     def initialize(results)
       validate_results(results)
@@ -15,30 +20,16 @@ module Mlk
     end
 
     def all
-      ResultSet.new(@results)
+      ResultSet.new(results)
     end
 
-    def each(&block)
-      @results.each(&block)
-    end
-
-    def include?(result)
-      @results.include?(result)
+    def reverse
+      ResultSet.new(results.reverse)
     end
 
     def ==(other)
       other.results == self.results
     end
-
-    def empty?
-      @results.empty?
-    end
-
-    def size
-      @results.size
-    end
-
-    alias_method :length, :size
 
     def [](name)
       first(:name => name)
@@ -51,7 +42,7 @@ module Mlk
     def find(filters)
       validate_filters(filters)
 
-      results = @results.select do |result|
+      find_results = results.select do |result|
         filters.all? do |param, value|
           if value == :exists
             result.data.has_key?(param.to_s)
@@ -61,13 +52,13 @@ module Mlk
         end
       end
 
-      ResultSet.new(results)
+      ResultSet.new(find_results)
     end
 
     def find_match(filters)
       validate_filters(filters)
 
-      results = @results.select do |result|
+      find_results = results.select do |result|
         filters.all? do |param, value|
           data = result.data[param.to_s]
 
@@ -82,11 +73,11 @@ module Mlk
         end
       end
 
-      ResultSet.new(results)
+      ResultSet.new(find_results)
     end
 
     def group_by(attribute)
-      grouped = @results.each_with_object({ }) do |result, acc|
+      grouped = results.each_with_object({ }) do |result, acc|
         key = result.send(attribute)
         acc[key] ||= []
         acc[key] << result
@@ -98,7 +89,7 @@ module Mlk
 
     def sort_by(attribute)
       attribute = attribute.to_sym
-      ResultSet.new(@results.sort_by(&attribute))
+      ResultSet.new(results.sort_by(&attribute))
     end
 
     private

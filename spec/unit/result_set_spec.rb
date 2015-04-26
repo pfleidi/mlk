@@ -7,7 +7,6 @@ module Mlk
   Result = Struct.new(:data)
 
   describe ResultSet do
-
     let(:all) do
       [
         Result.new({ 'name' => 'foo', 'show' => 'oww', 'a' => 'x' }),
@@ -26,7 +25,6 @@ module Mlk
     let(:default_set) { ResultSet.new(all) }
 
     describe '#initialize' do
-
       it 'sets the correct results' do
         ResultSet.new([ ]).results.must_equal([ ])
       end
@@ -45,11 +43,21 @@ module Mlk
         lambda { ResultSet.new(nil) }.must_raise(ArgumentError)
         lambda { ResultSet.new('') }.must_raise(ArgumentError)
       end
+    end
 
+    describe '#all' do
+      it 'returns all values' do
+        default_set.all.must_equal(ResultSet.new(all))
+      end
+    end
+
+    describe '#reverse' do
+      it 'returns all results reversed' do
+        default_set.reverse.must_equal(ResultSet.new(all.reverse))
+      end
     end
 
     describe '#first' do
-
       it 'can find a single element by attribute' do
         result = default_set.first(name: 'foo')
         result.must_equal(Result.new({ 'name' => 'foo', 'show' => 'oww', 'a' => 'x' }))
@@ -64,11 +72,9 @@ module Mlk
         result = default_set.first(show: 'oww')
         result.must_equal(Result.new({ 'name' => 'foo', 'show' => 'oww', 'a' => 'x' }))
       end
-
     end
 
     describe '#find' do
-
       it 'returns an empty array when filters do not match' do
         default_set.find(non_existing_attribute: 'non_existing_value').must_be_empty
       end
@@ -126,11 +132,9 @@ module Mlk
           Result.new({ 'name' => 'bar', 'show' => 'oww', 'a' => 'c' })
         ]))
       end
-
     end
 
     describe '#find_match' do
-
       it 'retuns an empty array when filters do not match' do
         default_set.find_match(non_existing_attribute: 'non_existing_value').must_be_empty
       end
@@ -164,11 +168,9 @@ module Mlk
         result.must_include Result.new({ 'name' => 'foo', 'show' => 'oww', 'a' => 'x' })
         result.must_include Result.new({ 'name' => 'bar', 'show' => 'oww', 'a'=> 'c' })
       end
-
     end
 
     describe '#group_by' do
-
       let(:grouped) do
         ResultSet.new([
           mock_with_attributes(show: 'foo'),
@@ -194,7 +196,6 @@ module Mlk
     end
 
     describe '#sort_by' do
-
       it 'can sort results by attribute' do
         results = mock
         results.expects(:kind_of?).with(Enumerable).returns(true)
@@ -202,9 +203,7 @@ module Mlk
 
         ResultSet.new(results).sort_by(:name).results.must_equal([ ])
       end
-
     end
-
   end
 
 end
