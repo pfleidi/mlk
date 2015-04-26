@@ -47,7 +47,13 @@ module Mlk
     end
 
     describe '.has_attribute?' do
-      # TODO write tests and implement
+      it 'returns true if the model has the attribute' do
+        TestModel.has_attribute?(:name).must_equal(true)
+      end
+
+      it 'returns false if model does not have the attribute' do
+        TestModel.has_attribute?(:woof).must_equal(false)
+      end
     end
 
     describe '#content' do
@@ -65,6 +71,13 @@ module Mlk
     describe '#name' do
       it 'returns the correct name' do
         subject.name.must_equal('foobert')
+      end
+    end
+
+    describe '#attributes' do
+      it 'delegates to the class method' do
+        Model.expects(:attributes).returns([:foo, :bar])
+        subject.attributes.must_equal([:foo, :bar])
       end
     end
 

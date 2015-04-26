@@ -55,6 +55,10 @@ module Mlk
       end
     end
 
+    def self.has_attribute?(attribute)
+      attributes.include?(attribute)
+    end
+
     def self.belongs_to(model, name)
       define_method(name) do
         name = name.to_s
@@ -72,6 +76,15 @@ module Mlk
           model_class.find(:"#{ reference }" => self.name)
         end
       end
+    end
+
+    def self.storage
+      ref = Utils.pluralize(to_reference)
+      Model.storage_engine.new(ref)
+    end
+
+    def self.to_reference
+      self.name.downcase
     end
 
     attr_reader :document
@@ -106,16 +119,6 @@ module Mlk
     def save
       self.class.storage.save(self.name, @document.serialize)
     end
-
-    def self.storage
-      ref = Utils.pluralize(to_reference)
-      Model.storage_engine.new(ref)
-    end
-
-    def self.to_reference
-      self.name.downcase
-    end
-
   end
 
 end
