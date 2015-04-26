@@ -112,6 +112,17 @@ module Mlk
       assert_present(:name)
     end
 
+    def template
+      data.fetch('template') { default_template }.to_sym
+    end
+
+    def default_template
+      self.class.name.split('::').last.
+        gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
+        gsub(/([a-z\d])([A-Z])/,'\1_\2').
+        tr("-", "_").downcase
+    end
+
     def ==(other_model)
       self.document == other_model.document
     end

@@ -96,6 +96,28 @@ module Mlk
         Model.new(document).valid?.must_equal(true)
       end
     end
+
+    describe '#template' do
+      describe 'without a given template' do
+        it 'returns the default template' do
+          subject.template.must_equal(:model)
+        end
+      end
+
+      describe 'with a given template and a CamelCase name' do
+        it 'returns the default template' do
+          OtherModel.new(document).template.must_equal(:other_model)
+        end
+      end
+
+      describe 'with a given template' do
+        before { data['template'] = 'my_template' }
+
+        it 'returns the given template' do
+          subject.template.must_equal(:my_template)
+        end
+      end
+    end
   end
 
 end
