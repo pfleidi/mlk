@@ -4,9 +4,9 @@ require_relative 'helper'
 
 module Mlk
 
-  Result = Struct.new(:data)
-
   describe ResultSet do
+    Result = Struct.new(:data)
+
     let(:all) do
       [
         Result.new({ 'name' => 'foo', 'show' => 'oww', 'a' => 'x' }),
@@ -22,7 +22,7 @@ module Mlk
       ]
     end
 
-    let(:default_set) { ResultSet.new(all) }
+    subject { ResultSet.new(all)}
 
     describe '#initialize' do
       it 'sets the correct results' do
@@ -47,54 +47,54 @@ module Mlk
 
     describe '#all' do
       it 'returns all values' do
-        default_set.all.must_equal(ResultSet.new(all))
+        subject.all.must_equal(ResultSet.new(all))
       end
     end
 
     describe '#reverse' do
       it 'returns all results reversed' do
-        default_set.reverse.must_equal(ResultSet.new(all.reverse))
+        subject.reverse.must_equal(ResultSet.new(all.reverse))
       end
     end
 
     describe '#first' do
       it 'can find a single element by attribute' do
-        result = default_set.first(name: 'foo')
+        result = subject.first(name: 'foo')
         result.must_equal(Result.new({ 'name' => 'foo', 'show' => 'oww', 'a' => 'x' }))
       end
 
       it 'can find a single element by multiple attributes' do
-        result = default_set.first(show: 'oww', 'a' => 'x')
+        result = subject.first(show: 'oww', 'a' => 'x')
         result.must_equal(Result.new({ 'name' => 'foo', 'show' => 'oww', 'a' => 'x' }))
       end
 
       it 'can find multiple elements by attribute' do
-        result = default_set.first(show: 'oww')
+        result = subject.first(show: 'oww')
         result.must_equal(Result.new({ 'name' => 'foo', 'show' => 'oww', 'a' => 'x' }))
       end
     end
 
     describe '#find' do
       it 'returns an empty array when filters do not match' do
-        default_set.find(non_existing_attribute: 'non_existing_value').must_be_empty
+        subject.find(non_existing_attribute: 'non_existing_value').must_be_empty
       end
 
       it 'cannot find elements without any filters' do
-        lambda { default_set.find }.must_raise(ArgumentError)
+        lambda { subject.find }.must_raise(ArgumentError)
       end
 
       it 'cannot find elements without a filters hash' do
-        lambda { default_set.find('trololo') }.must_raise(ArgumentError)
+        lambda { subject.find('trololo') }.must_raise(ArgumentError)
       end
 
       it 'can find a single element by attribute' do
-        default_set.find(name: 'foo').must_equal(ResultSet.new(
+        subject.find(name: 'foo').must_equal(ResultSet.new(
           [Result.new({ 'name' => 'foo', 'show' => 'oww', 'a' => 'x' })]
         ))
       end
 
       it 'can find multiple elements by attribute' do
-        result = default_set.find(show: 'oww')
+        result = subject.find(show: 'oww')
         result.must_be_kind_of(ResultSet)
         result.size.must_equal(3)
         result.must_include Result.new({ 'name' => 'foo', 'show' => 'oww', 'a' => 'x' })
@@ -103,7 +103,7 @@ module Mlk
       end
 
       it 'can find multiple elements by multiple attributes' do
-        result = default_set.find(show: 'oww', 'a' => 'c')
+        result = subject.find(show: 'oww', 'a' => 'c')
         result.must_be_kind_of(ResultSet)
         result.size.must_equal(2)
         result.must_include Result.new({ 'name' => 'bar', 'show' => 'oww', 'a'=> 'c' })
@@ -111,12 +111,12 @@ module Mlk
       end
 
       it 'can find elements by attribute existance' do
-        result = default_set.find(other_value: :exists)
+        result = subject.find(other_value: :exists)
         result.size.must_equal(2)
       end
 
       it 'can find results by attribute' do
-        found = default_set.find(show: 'oww')
+        found = subject.find(show: 'oww')
         found.must_be_kind_of(ResultSet)
 
         found.must_equal(ResultSet.new([
@@ -136,19 +136,19 @@ module Mlk
 
     describe '#find_match' do
       it 'retuns an empty array when filters do not match' do
-        default_set.find_match(non_existing_attribute: 'non_existing_value').must_be_empty
+        subject.find_match(non_existing_attribute: 'non_existing_value').must_be_empty
       end
 
       it 'cannot find elements without any filters' do
-        lambda { default_set.find_match }.must_raise(ArgumentError)
+        lambda { subject.find_match }.must_raise(ArgumentError)
       end
 
       it 'cannot find elements without a filters hash' do
-        lambda { default_set.find_match('fufu') }.must_raise(ArgumentError)
+        lambda { subject.find_match('fufu') }.must_raise(ArgumentError)
       end
 
       it 'can find elements by single match attribute' do
-        result = default_set.find_match(arr: "baz")
+        result = subject.find_match(arr: "baz")
         result.must_be_kind_of(ResultSet)
         result.size.must_equal(2)
         result.must_include Result.new({ 'name' => 'huh', 'arr' => %w{ foo bar baz } })
@@ -156,14 +156,14 @@ module Mlk
       end
 
       it 'can find elements by multiple match attributes' do
-        result = default_set.find_match(arr: 'baz', name: 'WAT')
+        result = subject.find_match(arr: 'baz', name: 'WAT')
         result.must_be_kind_of(ResultSet)
         result.size.must_equal(1)
         result.must_include Result.new({ 'name' => 'WAT', 'arr' => %w{ jo no baz } })
       end
 
       it 'can find elements by regex' do
-        result = default_set.find_match(name: /(foo|bar)/)
+        result = subject.find_match(name: /(foo|bar)/)
         result.size.must_equal(2)
         result.must_include Result.new({ 'name' => 'foo', 'show' => 'oww', 'a' => 'x' })
         result.must_include Result.new({ 'name' => 'bar', 'show' => 'oww', 'a'=> 'c' })
@@ -192,7 +192,6 @@ module Mlk
       it 'returns empty arrays for keys not available' do
         grouped[:does_not_exist].must_equal([ ])
       end
-
     end
 
     describe '#sort_by' do
@@ -202,6 +201,54 @@ module Mlk
         results.expects(:sort_by).returns([ ])
 
         ResultSet.new(results).sort_by(:name).results.must_equal([ ])
+      end
+    end
+
+    describe '#paginate' do
+      describe 'with the default page size' do
+        it 'returns the first 5 elements of the results collection' do
+          paginated = subject.paginate
+          paginated.size.must_equal(5)
+          paginated.results.must_equal(all.first(5))
+        end
+
+        it 'returns the rest of the elements for the second page' do
+          paginated = subject.paginate(:page => 2)
+          paginated.size.must_equal(3)
+          paginated.results.must_equal(all.last(3))
+        end
+
+        it 'returns an empty result set for out of range pages' do
+          paginated = subject.paginate(:page => 5)
+          paginated.size.must_equal(0)
+        end
+
+        it 'returns an empty result set for negative pages' do
+          paginated = subject.paginate(:page => -1)
+          paginated.size.must_equal(0)
+        end
+      end
+
+      describe 'with a custom page size' do
+        let(:per_page) { 3 }
+
+        it 'returns the first 3 elements of the results collection' do
+          paginated = subject.paginate(:per_page => per_page)
+          paginated.size.must_equal(3)
+          paginated.results.must_equal(all.first(3))
+        end
+
+        it 'returns elements 4 - 6 of the results collection' do
+          paginated = subject.paginate(:page => 2, :per_page => per_page)
+          paginated.size.must_equal(3)
+          paginated.results.must_equal(all.slice(3..5))
+        end
+
+        it 'returns the last 2 elements of the results collection' do
+          paginated = subject.paginate(:page => 3, :per_page => per_page)
+          paginated.size.must_equal(2)
+          paginated.results.must_equal(all.last(2))
+        end
       end
     end
   end

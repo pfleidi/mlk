@@ -92,6 +92,15 @@ module Mlk
       ResultSet.new(results.sort_by(&attribute))
     end
 
+    def paginate(args = {})
+      page = args.fetch(:page) { 1 }
+      per_page = args.fetch(:per_page) { 5 }
+      offset = (page - 1) * per_page
+
+      paginated_results = Array(results.slice(offset, per_page))
+      self.class.new(paginated_results)
+    end
+
     private
 
     def validate_results(res)
