@@ -6,6 +6,7 @@ module Mlk
 
   class ResultSet
     extend Forwardable
+    include Enumerable
 
     attr_reader :results
 
